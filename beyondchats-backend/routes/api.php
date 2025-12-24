@@ -14,7 +14,6 @@ Route::get('/user', function (Request $request) {
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
-        'service' => 'beyondchats-backend'
+        'service' => 'beyondchats-backend',
     ]);
 });
-
