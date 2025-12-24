@@ -5,10 +5,10 @@ import { getTopTwoLinks, scrapeMainContent } from './scraper.js';
 import { formatWithLLM } from './llm.js';
 import axios from 'axios';
 
-// 1. INITIALIZE APP (This is what's missing!)
+
 const app = express();
 
-// 2. MIDDLEWARE
+
 app.use(cors({
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT'],
@@ -18,8 +18,8 @@ app.use(express.json());
 
 const LARAVEL_API = process.env.LARAVEL_API_URL;
 
-// 3. ROUTES
-// index.js
+
+
 app.post('/api/article/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -54,7 +54,8 @@ app.post('/api/article/:id', async (req, res) => {
     }
 });
 
-// 4. LISTEN (This is line 42 that was throwing the error)
-app.listen(5000, () => {
-    console.log("NodeJS LLM Service running on Port 5000");
+
+const port = process.env.PORT || 5000; // Railway will inject the correct port here
+app.listen(port, () => {
+    console.log(`LLM Service listening on port ${port}`);
 });

@@ -10,3 +10,11 @@ Route::apiResource('articles', ArticleController::class);
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'service' => 'beyondchats-backend'
+    ]);
+});
+
