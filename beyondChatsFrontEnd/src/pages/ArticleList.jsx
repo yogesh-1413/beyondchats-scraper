@@ -43,7 +43,7 @@ function ArticleList() {
       <div className="max-w-md mx-auto mt-20 p-6 bg-red-50 rounded-lg border border-red-200 text-center">
         <AlertCircle className="mx-auto text-red-500 mb-2" size={40} />
         <p className="text-red-700 font-medium">{error}</p>
-        <button onClick={() => window.location.reload()} className="mt-4 text-sm underline">Try Again</button>
+        <button onClick={() => window.location.reload()} className="mt-4 text-sm bg-red-500 p-2 px-6 rounded-full hover:bg-gray-800 hover:text-red-600 transition-all duration-300">Try Again</button>
       </div>
     );
   }

@@ -41,7 +41,7 @@ export async function scrapeMainContent(url) {
     return $('body').text().replace(/\s\s+/g, ' ').trim().substring(0, 3000);
   } catch (error) {
     console.error(`Failed to scrape ${url}:`, error.message);
-    return "Scraping failed for this source.";
+    return "Scraping failed for this source Try Another Article or Try Again.";
   }
 }
 

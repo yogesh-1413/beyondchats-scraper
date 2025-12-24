@@ -8,10 +8,11 @@
     "require": {
         "php": "^8.2",
         "guzzlehttp/guzzle": "^7.10",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
-        "symfony/dom-crawler": "^8.0"
+        "symfony/dom-crawler": "^7.0",
+        "symfony/css-selector": "^7.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -82,6 +83,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "php": "8.2.30"
         }
     },
     "minimum-stability": "stable",
