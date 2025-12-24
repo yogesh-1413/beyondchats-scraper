@@ -1,0 +1,34 @@
+# --- General / OS ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# --- Environment Files (CRITICAL for Security) ---
+.env
+.env.*
+!.env.example
+auth.json
+
+# --- Dependencies & Build Artifacts ---
+**/node_modules/
+**/vendor/
+**/dist/
+**/public/build/
+**/public/hot/
+
+# --- Laravel Specific ---
+beyondchats-backend/storage/*.key
+beyondchats-backend/storage/framework/cache/*
+beyondchats-backend/storage/framework/sessions/*
+beyondchats-backend/storage/framework/views/*
+
+# --- SQLite Database (Keep local data out of Git) ---
+beyondchats-backend/database/*.sqlite
+beyondchats-backend/database/*.sqlite-journal
+
+# --- Editor / Tools ---
+.phpactor.json
+.phpunit.result.cache
+.phpunit.cache

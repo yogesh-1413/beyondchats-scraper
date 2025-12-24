@@ -18,7 +18,7 @@ class ArticleController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string',
-            'url'   => 'required|url|unique:articles',
+            'url' => 'required|url|unique:articles',
             'content' => 'nullable|string',
         ]);
 
@@ -39,13 +39,16 @@ class ArticleController extends Controller
     // UPDATE: Modify an existing article
     public function update(Request $request, $id)
     {
-        $article = Article::find($id);
-        if (!$article) {
-            return response()->json(['message' => 'Article not found'], 404);
-        }
+        $article = Article::findOrFail($id);
 
+        $article->updated_content = $request->updated_content;
+        $article->reference_links = $request->reference_links;
+        $article->is_updated = true;
+        $article->updated_at = now();
         $article->update($request->all());
-        return response()->json($article, 200);
+        $article->save();
+
+        return response()->json($article);
     }
 
     // DELETE: Remove an article
