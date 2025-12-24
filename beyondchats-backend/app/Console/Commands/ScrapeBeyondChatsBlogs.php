@@ -26,48 +26,80 @@ class ScrapeBeyondChatsBlogs extends Command
     /**
      * Execute the console command.
      */
- public function handle()
-{
-    $this->info('Starting scrape...');
+    public function handle()
+    {
+        $this->info('Starting Deep Scrape for the 5 oldest articles...');
+        $collectedArticles = [];
 
-    try {
-        $response = Http::withHeaders([
-            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'
-        ])->get('https://beyondchats.com/blogs/');
-
+        $response = Http::get('https://beyondchats.com/blogs/');
         $crawler = new Crawler($response->body());
-        $lastPage = 1;
-        $crawler->filter('a.page-numbers')->each(function (Crawler $node) use (&$lastPage) {
+        $currentPage = 1;
+
+        // 1. Get total pages
+        $crawler->filter('a.page-numbers')->each(function (Crawler $node) use (&$currentPage) {
             $val = trim($node->text());
-            if (is_numeric($val) && (int)$val > $lastPage) {
-                $lastPage = (int)$val;
-                $lastPage = $lastPage-1;
+            if (is_numeric($val) && (int) $val > $currentPage) {
+                $currentPage = (int) $val;
             }
         });
 
-        $this->info("Navigating to page: " . $lastPage);
+        while (count($collectedArticles) < 5 && $currentPage > 0) {
+            $this->info("Accessing list page {$currentPage}...");
+            $pageResponse = Http::get("https://beyondchats.com/blogs/page/{$currentPage}/");
+            $pageCrawler = new Crawler($pageResponse->body());
 
-        $oldestResponse = Http::get("https://beyondchats.com/blogs/page/{$lastPage}/");
-        $oldestCrawler = new Crawler($oldestResponse->body());
+            $links = $pageCrawler->filter('h2.entry-title a')->each(function (Crawler $node) {
+                return $node->attr('href');
+            });
 
-        $oldestCrawler->filter('article')->slice(-5)->each(function (Crawler $node) {
-            $title = $node->filter('h2')->count() ? $node->filter('h2')->text() : 'Untitled';
-            $url = $node->filter('a')->first()->attr('href');
-            
+            if (empty($links)) {
+                $this->warn("No links found on page {$currentPage}. Checking selectors...");
+            }
+
+            $links = array_reverse($links);
+
+            foreach ($links as $url) {
+                if (count($collectedArticles) < 5) {
+                    $this->line("Deep scraping: " . $url);
+
+                    try {
+                        $articleResponse = Http::get($url);
+                        $articleCrawler = new Crawler($articleResponse->body());
+                        $title = 'Untitled';
+
+                        if ($articleCrawler->filter('h1.entry-title')->count()) {
+                            $title = $articleCrawler->filter('h1.entry-title')->text();
+                        } elseif ($articleCrawler->filter('h1.elementor-heading-title')->count()) {
+                            $title = $articleCrawler->filter('h1.elementor-heading-title')->text();
+                        } elseif ($articleCrawler->filter('h1')->count()) {
+                            $title = $articleCrawler->filter('h1')->first()->text();
+                        } elseif ($articleCrawler->filter('')->count()) {
+
+                        }
+
+                        $contentNode = $articleCrawler->filter('.elementor-widget-theme-post-content, .entry-content');
+                        $content = $contentNode->count() ? $contentNode->first()->text() : 'Content not found';
+
+                        $collectedArticles[] = [
+                            'title' => trim($title),
+                            'url' => $url,
+                            'content' => trim($content)
+                        ];
+                    } catch (\Exception $e) {
+                        $this->error("Failed to scrape {$url}: " . $e->getMessage());
+                    }
+                }
+            }
+            $currentPage--;
+        }
+
+        foreach ($collectedArticles as $data) {
             \App\Models\Article::updateOrCreate(
-                ['url' => $url],
-                [
-                    'title' => trim($title),
-                    'content' => 'Oldest blog content from BeyondChats'
-                ]
+                ['url' => $data['url']],
+                ['title' => $data['title'], 'content' => $data['content']]
             );
-            $this->line("Saved to SQLite: " . trim($title));
-        });
-
-        $this->info('Scraping complete!');
-
-    } catch (\Exception $e) {
-        $this->error('Something went wrong: ' . $e->getMessage());
+            $this->info("Successfully saved: " . $data['title']);
+        }
+        $this->info('Scraping completed. Total articles saved: ' . count($collectedArticles));
     }
-}
 }

@@ -13,6 +13,8 @@ public function up(): void
         $table->string('title');
         $table->string('url')->unique(); // Add this line
         $table->text('content')->nullable();
+        $table->text('updated_content')->nullable();
+        $table->boolean('is_updated')->default(false);
         $table->timestamps();
     });
 }
