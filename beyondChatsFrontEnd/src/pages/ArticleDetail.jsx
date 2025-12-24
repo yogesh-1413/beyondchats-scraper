@@ -29,10 +29,13 @@ function ArticleDetails({ id }) {
   const handleSummarize = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(`http://localhost:5000/api/article/${articleId}/`);
+      const response = await axios.post(
+        `${import.meta.env.VITE_LLM_API_BASE_URL}/api/article/${articleId}`
+      );
+
       if (response.status === 200) {
         alert("Success! Content optimized.");
-        await fetchArticle(); // Refresh data immediately
+        await fetchArticle();
       }
     } catch (error) {
       console.error("LLM-Service failed:", error);
@@ -119,23 +122,23 @@ function ArticleDetails({ id }) {
 
           {/* Scraped Raw Data (Debugging Phase 2) */}
           {article.ref_content_1 && (
-             <div className="bg-white p-4 border rounded-lg">
-                <h4 className="text-xs font-bold text-gray-400 mb-2">RAW SCRAPED DATA FROM LINK 1</h4>
-                <div className="text-[10px] text-gray-400 h-20 overflow-y-auto bg-gray-50 p-2">
-                  {article.ref_content_1}
-                </div>
-             </div>
+            <div className="bg-white p-4 border rounded-lg">
+              <h4 className="text-xs font-bold text-gray-400 mb-2">RAW SCRAPED DATA FROM LINK 1</h4>
+              <div className="text-[10px] text-gray-400 h-20 overflow-y-auto bg-gray-50 p-2">
+                {article.ref_content_1}
+              </div>
+            </div>
           )}
           {article.ref_content_2 && (
-             <div className="bg-white p-4 border rounded-lg">
-                <h4 className="text-xs font-bold text-gray-400 mb-2">RAW SCRAPED DATA FROM LINK 2</h4>
-                <div className="text-[10px] text-gray-400 h-20 overflow-y-auto bg-gray-50 p-2">
-                  {article.ref_content_2}
-                </div>
-             </div>
+            <div className="bg-white p-4 border rounded-lg">
+              <h4 className="text-xs font-bold text-gray-400 mb-2">RAW SCRAPED DATA FROM LINK 2</h4>
+              <div className="text-[10px] text-gray-400 h-20 overflow-y-auto bg-gray-50 p-2">
+                {article.ref_content_2}
+              </div>
+            </div>
           )}
         </div>
-        
+
       </div>
     </div>
   );
