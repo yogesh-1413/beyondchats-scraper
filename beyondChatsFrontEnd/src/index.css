@@ -1,0 +1,32 @@
+@import "tailwindcss";
+  body {
+  font-family: Arial, sans-serif;
+  background: #f5f6f8;
+  margin: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  display: block;
+  background: white;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: black;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  transition: 0.2s;
+}
+
+h1, h3 {
+  margin-top: 0;
+}
