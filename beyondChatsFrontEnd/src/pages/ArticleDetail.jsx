@@ -30,8 +30,9 @@ function ArticleDetails({ id }) {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_LLM_API_BASE_URL}/api/article/${articleId}`
+        `${import.meta.env.VITE_LLM_API_URL}/article/${articleId}`
       );
+
 
       if (response.status === 200) {
         alert("Success! Content optimized.");

@@ -34,10 +34,10 @@ export async function scrapeMainContent(url) {
     });
     const $ = cheerio.load(data);
     
-    // Remove noise like scripts, styles, and navbars
+    
     $('script, style, nav, footer, header').remove();
     
-    // Get the text, clean whitespace, and limit length for the database
+    
     return $('body').text().replace(/\s\s+/g, ' ').trim().substring(0, 3000);
   } catch (error) {
     console.error(`Failed to scrape ${url}:`, error.message);
