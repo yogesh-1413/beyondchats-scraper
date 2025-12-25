@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
-    // READ: List all articles
+    
     public function index()
     {
         return response()->json(Article::all(), 200);
@@ -62,4 +62,22 @@ class ArticleController extends Controller
         $article->delete();
         return response()->json(['message' => 'Article deleted successfully'], 200);
     }
+    public function resetGeneratedContent($id)
+{
+    $article = Article::findOrFail($id);
+
+    $article->update([
+        'updated_content' => null,
+        'reference_links' => null,
+        'ref_content_1' => null,
+        'ref_content_2' => null,
+        'is_updated' => false,
+    ]);
+
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'Generated content erased successfully'
+    ]);
+}
+
 }

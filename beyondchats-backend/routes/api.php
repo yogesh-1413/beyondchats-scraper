@@ -17,3 +17,4 @@ Route::get('/health', function () {
         'service' => 'beyondchats-backend',
     ]);
 });
+Route::put('/articles/{id}/reset', [ArticleController::class, 'resetGeneratedContent']);

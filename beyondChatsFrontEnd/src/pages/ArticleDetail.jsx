@@ -45,6 +45,22 @@ function ArticleDetails({ id }) {
       setLoading(false);
     }
   };
+  const handleEraseGenerated = async () => {
+    const confirm = window.confirm(
+      "Are you sure you want to erase AI-generated content?"
+    );
+
+    if (!confirm) return;
+
+    try {
+      await axios.put(`${API}/articles/${articleId}/reset`);
+      alert("Generated content erased.");
+      await fetchArticle();
+    } catch (error) {
+      console.error("Erase failed:", error);
+      alert("Failed to erase generated content.");
+    }
+  };
 
   // --- CRASH PROOF HELPER ---
   const getSafeLinks = (links) => {
@@ -138,6 +154,13 @@ function ArticleDetails({ id }) {
               </div>
             </div>
           )}
+          <button
+            onClick={handleEraseGenerated}
+            className="mt-2 bg-red-100 text-red-700 px-6 py-2 rounded-lg font-medium hover:bg-red-200 transition-all"
+          >
+            Erase Generated Content
+          </button>
+
         </div>
 
       </div>
