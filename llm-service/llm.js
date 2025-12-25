@@ -1,21 +1,46 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { OpenRouter } from "@openrouter/sdk";
+
+const openRouter = new OpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": process.env.SITE_URL || "http://localhost:3000",
+    "X-Title": "BeyondChats AI Optimizer",
+  },
+});
 
 export async function formatWithLLM(originalContent, reference1, reference2) {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
-    // Change 'gemini-pro' to 'gemini-1.5-flash'
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const prompt = `
+You are a professional technical content editor.
 
-    const prompt = `
-        Original Article: ${originalContent}
-        Reference 1: ${reference1}
-        Reference 2: ${reference2}
-        
-        Task: Update the original article's formatting and content to be similar to the two reference articles. 
-        Maintain a professional tone and ensure the structure is optimized.
-    `;
+ORIGINAL ARTICLE:
+${originalContent}
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+REFERENCE ARTICLE 1:
+${reference1}
+
+REFERENCE ARTICLE 2:
+${reference2}
+
+TASK:
+- Improve clarity, structure, and readability
+- Keep the original meaning intact
+- Use professional tone
+- Use headings, bullet points where appropriate
+- Do NOT hallucinate facts
+- Output ONLY the improved article
+`;
+
+  const completion = await openRouter.chat.send({
+    model: "openai/gpt-oss-20b:free",
+    messages: [
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    temperature: 0.4,
+    max_tokens: 900,
+  });
+
+  return completion.choices[0].message.content;
 }

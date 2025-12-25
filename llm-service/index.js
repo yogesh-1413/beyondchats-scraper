@@ -15,7 +15,7 @@ app.use(express.json());
 const LARAVEL_API = process.env.LARAVEL_API_URL;
 
 app.get('/', (req, res) => {
-  res.send('LLM Service is running');
+    res.send('LLM Service is running');
 });
 
 
@@ -38,13 +38,20 @@ app.post('/api/article/:id', async (req, res) => {
         const ref2 = await scrapeMainContent(links[1]);
         console.log(`Step 3: Scraping successful (Lengths: ${ref1.length}, ${ref2.length})`);
 
-        // Step 4: Save to Database (Skip Gemini for now)
+        // Step 4: Format via LLM
+        const optimized = await formatWithLLM(
+            article.content,
+            ref1,
+            ref2
+        );
+
         await axios.put(`${LARAVEL_API}/${id}`, {
             ref_content_1: ref1,
             ref_content_2: ref2,
             reference_links: links,
-            updated_content: "DEBUG MODE: SCRAPING SUCCESSFUL. Gemini step bypassed."
+            updated_content: optimized
         });
+
 
         console.log("Step 4: Database updated.");
         res.status(200).json({ success: true, links });

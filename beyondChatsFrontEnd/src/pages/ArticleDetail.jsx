@@ -3,6 +3,9 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -78,7 +81,7 @@ function ArticleDetails({ id }) {
   const safeLinks = getSafeLinks(article.reference_links);
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-8xl mx-auto p-6">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 border-b pb-4">
         <div>
@@ -96,11 +99,11 @@ function ArticleDetails({ id }) {
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-10">
+      <div className="grid lg:grid-cols-2 gap-5">
         {/* LEFT COLUMN: ORIGINAL */}
         <div className="bg-white p-6 rounded-xl shadow-sm border">
           <h2 className="text-lg font-bold mb-4 text-gray-700 uppercase tracking-wider">Original Content</h2>
-          <div className="text-gray-800 leading-relaxed whitespace-pre-line text-sm h-[600px] overflow-y-auto pr-2">
+          <div className="text-gray-800 leading-relaxed whitespace-pre-line text-sm h-screen overflow-y-auto pr-2">
             {article.content}
           </div>
         </div>
@@ -110,9 +113,9 @@ function ArticleDetails({ id }) {
           {/* AI Optimized Result */}
           <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
             <h2 className="text-lg font-bold mb-4 text-blue-800 uppercase tracking-wider">AI Optimized Content</h2>
-            <div className="text-gray-800 leading-relaxed text-sm max-h-[400px] overflow-y-auto">
+            <div className="text-gray-800 leading-relaxed text-sm max-h-screen overflow-y-auto">
               {article.updated_content ? (
-                <p className="whitespace-pre-line">{article.updated_content}</p>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.updated_content}</ReactMarkdown>
               ) : (
                 <p className="italic text-gray-500">Run summarization to see AI optimized version.</p>
               )}

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { getArticles } from "../api";
 import { BookOpen, Clock, ChevronRight, AlertCircle } from "lucide-react"; // Nice icons
 import axios from 'axios';
-import Refresh from './Refresh';
 
 function ArticleList() {
   const [articles, setArticles] = useState([]);
