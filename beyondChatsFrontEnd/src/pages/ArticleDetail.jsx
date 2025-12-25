@@ -25,26 +25,30 @@ function ArticleDetails({ id }) {
   useEffect(() => {
     fetchArticle();
   }, [articleId]);
+const handleSummarize = async () => {
+  setLoading(true);
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_LLM_API_URL}/article/${articleId}`,
+      {}, // empty body
+      { timeout: 60000 } // Wait for 120 seconds (2 minutes)
+    );
 
-  const handleSummarize = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_LLM_API_URL}/article/${articleId}`
-      );
-
-
-      if (response.status === 200) {
-        alert("Success! Content optimized.");
-        await fetchArticle();
-      }
-    } catch (error) {
+    if (response.status === 200) {
+      alert("Success! Content optimized.");
+      await fetchArticle();
+    }
+  } catch (error) {
+    if (error.code === 'ECONNABORTED') {
+      alert("The AI is taking a bit longer than usual. Please wait a moment and refresh.");
+    } else {
       console.error("LLM-Service failed:", error);
       alert("Failed to connect to optimization service.");
-    } finally {
-      setLoading(false);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   // --- CRASH PROOF HELPER ---
   const getSafeLinks = (links) => {
