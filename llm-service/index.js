@@ -9,11 +9,7 @@ import axios from 'axios';
 const app = express();
 
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT'],
-    allowedHeaders: ['Content-Type']
-}));
+app.use(cors());
 app.use(express.json());
 
 const LARAVEL_API = process.env.LARAVEL_API_URL;
