@@ -18,6 +18,10 @@ app.use(express.json());
 
 const LARAVEL_API = process.env.LARAVEL_API_URL;
 
+app.get('/', (req, res) => {
+  res.send('LLM Service is running');
+});
+
 
 
 app.post('/api/article/:id', async (req, res) => {
