@@ -2,12 +2,50 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getArticles } from "../api";
 import { BookOpen, Clock, ChevronRight, AlertCircle } from "lucide-react"; // Nice icons
+import axios from 'axios';
+import Refresh from './Refresh';
 
 function ArticleList() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const APP_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      
+      const response = await axios.post(
+        `${APP_API_BASE_URL}/refresh-articles`,
+        {},
+        { timeout: 120000 }
+      );
+
+      if (response.data.success) {
+        alert("Latest articles fetched!");
+        // 2. Instead of full reload, better to re-trigger your data fetch function
+        if (typeof fetchArticles === 'function') {
+          await fetchArticles();
+        } else {
+          window.location.reload();
+        }
+      }
+    } catch (error) {
+      console.error("Refresh failed:", error);
+
+      // 3. Extract the actual error message from Laravel if it exists
+      const errorMessage = error.response?.data?.message || error.message;
+
+      if (error.code === 'ECONNABORTED') {
+        alert("Refresh Timed Out: The scraper is still running. Please wait a moment and refresh manually.");
+      } else {
+        alert("Refresh failed: " + errorMessage);
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -31,7 +69,7 @@ function ArticleList() {
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-8 w-64 bg-gray-200 rounded mb-8"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-             {[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-gray-100 rounded-xl"></div>)}
+            {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-48 bg-gray-100 rounded-xl"></div>)}
           </div>
         </div>
       </div>
@@ -57,48 +95,56 @@ function ArticleList() {
       {articles.length === 0 ? (
         <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed">
           <p className="text-gray-500">No articles found in the database.</p>
-           <button onClick={() => window.location.reload()} className="mt-4 text-sm bg-gray-500 p-2 px-6 rounded-full hover:bg-gray-800 hover:text-gray-200 transition-all duration-300">Refesh</button>
+          <button onClick={() => window.location.reload()} className="mt-4 text-sm bg-gray-500 p-2 px-6 rounded-full hover:bg-gray-800 hover:text-gray-200 transition-all duration-300">Refesh</button>
         </div>
       ) : (
         <div>
           <p className="mb-5 font-bold">Here are the Last 5 Articles From Beyond Chats :</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          
-          {articles.map((article) => (
-            <div>
-              
-            <Link 
-              key={article.id} 
-              to={`/article/${article.id}`} 
-              className="group bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${article.updated_content ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                    {article.updated_content ? 'Optimized' : 'Original'}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors">
-                  {article.title}
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                  {article.content}
-                </p>
-              </div>
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="mb-6 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all"
+          >
+            {isRefreshing ? "Refreshing....It might take 1-2 Minutes..." : "Sync Latest Articles"}
+          </button>
 
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-                <span className="flex items-center text-xs text-gray-400">
-                  <Clock size={14} className="mr-1" /> 
-                  {new Date(article.created_at).toLocaleDateString()}
-                </span>
-                <span className="flex items-center text-sm font-semibold text-blue-500 group-hover:translate-x-1 transition-transform">
-                  View Details <ChevronRight size={16} />
-                </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            {articles.map((article) => (
+              <div>
+
+                <Link
+                  key={article.id}
+                  to={`/article/${article.id}`}
+                  className="group bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase ${article.updated_content ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                        {article.updated_content ? 'Optimized' : 'Original'}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                      {article.content}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
+                    <span className="flex items-center text-xs text-gray-400">
+                      <Clock size={14} className="mr-1" />
+                      {new Date(article.created_at).toLocaleDateString()}
+                    </span>
+                    <span className="flex items-center text-sm font-semibold text-blue-500 group-hover:translate-x-1 transition-transform">
+                      View Details <ChevronRight size={16} />
+                    </span>
+                  </div>
+                </Link>
               </div>
-            </Link>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Api\ScraperController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ArticleController;
@@ -18,3 +18,4 @@ Route::get('/health', function () {
     ]);
 });
 Route::put('/articles/{id}/reset', [ArticleController::class, 'resetGeneratedContent']);
+Route::post('/refresh-articles', [ScraperController::class, 'refreshArticles']);
